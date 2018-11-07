@@ -1,6 +1,11 @@
 {% extends "layout.html" %}
 {% block title %}New Post{% endblock %}
 {% block content %}
+    {% if not_valid_date %}
+        <div class="alert alert-danger" role="alert">
+           Please insert a valid date combination (%y-%m-%d)!
+        </div>
+    {% endif %}
     <h1>New Post</h1>
     <ul class="nav nav-tabs">
       <li class="nav-item">
@@ -24,19 +29,19 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="titlepost">Title</label><br>
-                                    <input type="text" name="titlepost" id="titlepost" class="form-control">
+                                    <input type="text" name="titlepost" id="titlepost" class="form-control" {% if not_valid_date %} value={{ titles[0] }} {% endif %}>
                                 </div>
                                 <div class="form-group">
                                     <label for="descriptionpost">Description</label><br>
-                                    <textarea class="form-control" rows="5" id="descriptionpost" name="descriptionpost"></textarea>
+                                    <textarea class="form-control" rows="5" id="descriptionpost" name="descriptionpost">{% if not_valid_date %} {{ descriptions[0] }} {% endif %}</textarea>
                                 </div>
                                 <div class="form-group">
                                     <label for="linkurlpost">Link</label><br>
-                                    <input type="text" name="linkurlpost" id="linkurlpost" class="form-control">
+                                    <input type="text" name="linkurlpost" id="linkurlpost" class="form-control" {% if not_valid_date %} value={{ links[0] }} {% endif %}>
                                 </div>
                                 <div class="form-group">
                                     <label for="imagepost">Image</label><br>
-                                    <input type="file" name="imagepost" id="imagepost" class="form-control">
+                                    <input type="file" name="imagepost" id="imagepost" class="form-control" {% if not_valid_date %} value={{ images[0] }} {% endif %}>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6">
@@ -92,19 +97,19 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="{{ chan.name }}_titlepost">Title</label><br>
-                                    <input type="text" name="{{ chan.name }}_titlepost" id="{{ chan.name }}_titlepost" class="form-control">
+                                    <input type="text" name="{{ chan.name }}_titlepost" id="{{ chan.name }}_titlepost" class="form-control" {% if not_valid_date %} value={{ titles[chan.id + 1] }} {% endif %}>
                                 </div>
                                 <div class="form-group">
                                     <label for="{{ chan.name }}_descriptionpost">Description</label><br>
-                                    <textarea class="form-control" rows="5" id="{{ chan.name }}_descriptionpost" name="{{ chan.name }}_descriptionpost"></textarea>
+                                    <textarea class="form-control" rows="5" id="{{ chan.name }}_descriptionpost" name="{{ chan.name }}_descriptionpost">{% if not_valid_date %} {{ descriptions[chan.id + 1] }} {% endif %}</textarea>
                                 </div>
                                 <div class="form-group">
                                     <label for="{{ chan.name }}_linkurlpost">Link</label><br>
-                                    <input type="text" name="{{ chan.name }}_linkurlpost" id="{{ chan.name }}_linkurlpost" class="form-control">
+                                    <input type="text" name="{{ chan.name }}_linkurlpost" id="{{ chan.name }}_linkurlpost" class="form-control" {% if not_valid_date %} value={{ links[chan.id + 1] }} {% endif %}>
                                 </div>
                                 <div class="form-group">
                                     <label for="{{ chan.name }}_imagepost">Image</label><br>
-                                    <input type="file" name="{{ chan.name }}_imagepost" id="{{ chan.name }}_imagepost" class="form-control">
+                                    <input type="file" name="{{ chan.name }}_imagepost" id="{{ chan.name }}_imagepost" class="form-control" {% if not_valid_date %} value={{ images[chan.id + 1] }} {% endif %}>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6">

@@ -23,6 +23,51 @@ def create_a_post(form):
     return p
 
 
+def valid_date(form):
+    try:
+        datetime_converter(form.get('datefrompost'))
+        datetime_converter(form.get('dateuntilpost'))
+    except ValueError:
+        return False
+    return True
+
+
+def get_data(form):
+    user_id = session.get("user_id", "") if session.get("logged_in", False) else -1
+    list_of_channels = channels_available_for_user(user_id)
+
+    for elem in list_of_channels:
+        m = elem.module
+        clas = get_instance_from_module_path(m)
+        unaivalable_fields = ','.join(clas.FIELDS_UNAVAILABLE)
+        setattr(elem, "unavailablefields", unaivalable_fields)
+
+    titles = {}
+    descriptions = {}
+    links = {}
+    images = {}
+
+    titles[0] = form.get('titlepost')
+    descriptions[0] = form.get('descriptionpost')
+    links[0] = form.get('linkurlpost')
+    images[0] = form.get('imagepost')
+    for elem in form:
+        if elem.startswith("chan_option_"):
+            def substr(elem):
+                import re
+                return re.sub('^chan\_option\_', '', elem)
+
+            chn = Channel.query.get(substr(elem))
+            chan = str(chn.name)
+            titles[chn.id + 1] = form.get(chan + '_titlepost') if (form.get(chan + '_titlepost') is not None) else form.get('titlepost')
+            descriptions[chn.id + 1] = form.get(chan + '_descriptionpost') if form.get(
+                chan + '_descriptionpost') is not None else form.get('descriptionpost')
+            links[chn.id + 1] = form.get(chan + '_linkurlpost') if form.get(chan + '_linkurlpost') is not None else form.get('linkurlpost')
+            images[chn.id + 1] = form.get(chan + '_imagepost') if form.get(chan + '_imagepost') is not None else form.get('imagepost')
+
+    return [list_of_channels, titles, descriptions, links, images]
+
+
 @posts_page.route('/new', methods=['GET', 'POST'])
 @login_required()
 def new_post():
@@ -45,7 +90,11 @@ def new_post():
 @login_required()
 def publish_from_new_post():
     # First create the post
-    p = create_a_post(request.form)
+    if valid_date(request.form):
+        p = create_a_post(request.form)
+    else:
+        values = get_data(request.form)
+        return render_template('new.html', l_chan=values[0], not_valid_date=True, titles=values[1], descriptions=values[2], links=values[3], images=values[4])
     # then treat the publish part
     if request.method == "POST":
         for elem in request.form:
